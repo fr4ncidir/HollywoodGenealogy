@@ -105,7 +105,7 @@ def main(args):
         print("Unable to find any direct genealogy")
     else:
         for r in result:
-            rlen = len(r)
+            rlen = len(r)-1
             if rlen > 1:
                 for i in range(1, rlen):
                     a1 = actor1_res if i == 1 else r["actor{}".format(i-1)]["value"]
