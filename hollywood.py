@@ -104,7 +104,7 @@ def main(args):
     if not result:
         print("Unable to find any direct genealogy")
     else:
-        print(result)
+        logging.debug(result)
         for r in result:
             index = 0
             end_of_result = False
@@ -114,25 +114,11 @@ def main(args):
                 if "actor{}".format(index+1) in r:
                     a2 = r["actor{}".format(index+1)]["value"]
                 else:
-                    a2 =actor2_res
+                    a2 = actor2_res
                     end_of_result = True
                 print("({}) {} starred with {} in {}".format(
                         index, a1, a2, f).replace("http://dbpedia.org/resource/", ":"))
                 index += 1
-            # rlen = len(r)
-            # index = 0
-            # print(rlen)
-            # if rlen > 1:
-                # for i in range(0, rlen):
-                    # a1 = actor1_res if i == 0 else r["actor{}".format(index)]["value"]
-                    # a2 = actor2_res if i == r else r["actor{}".format(i+1)]["value"]
-                    # f = r["film{}".format(i)]["value"]
-                    # print("({}) {} starred with {} in {}".format(
-                        # i, a1, a2, f).replace("http://dbpedia.org/resource/", ":"))
-            # else:
-                # print("{} starred with {} in {}".format(
-                        # actor1_res, actor2_res, 
-                        # r["film0"]["value"]).replace("http://dbpedia.org/resource/", ":"))
     return 0
 
 if __name__ == '__main__':
