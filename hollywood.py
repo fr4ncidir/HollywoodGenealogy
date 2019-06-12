@@ -61,7 +61,10 @@ def dbpedia_query(prefixes, sparql_query, address=ENDPOINT_ADDRESS):
 def genealogy_research(actor1, actor2, n_alternatives=1):
     template = "?film{} dbpo:starring ?actor{}. ?film{} dbpo:starring ?actor{}."
     depht = 1
-    while depht <= MAX_DEPHT:
+    while True:
+        if depht > MAX_DEPHT:
+            logging.error("Max depht reached! Aborting research.")
+            return []
         sparql = "SELECT * WHERE {"
         lines = " ".join([ template.format(i,i,i,i+1) for i in range(depht) ])
         if n_alternatives >= 1:
@@ -74,13 +77,9 @@ def genealogy_research(actor1, actor2, n_alternatives=1):
         result = dbpedia_query(PREFIXES,sparql)["results"]["bindings"]
         if result:
             logging.debug(result)
-            break
-        elif depht > MAX_DEPHT:
-            logging.error("Max depht reached! Aborting research.")
-            break
+            return result
         else:
             depht += 1
-    return result
 
 
 def main(args):
