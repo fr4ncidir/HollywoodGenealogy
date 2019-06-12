@@ -100,7 +100,7 @@ def main(args):
     actor1_res = query_actors[0]["actor1"]["value"]
     actor2_res = query_actors[0]["actor2"]["value"]
     
-    result = genealogy_research(actor1_res, actor2_res)
+    result = genealogy_research(actor1_res, actor2_res, int(args["alternatives"]))
     if not result:
         print("Unable to find any direct genealogy")
     else:
@@ -119,11 +119,13 @@ def main(args):
                 print("({}) {} starred with {} in {}".format(
                         index, a1, a2, f).replace("http://dbpedia.org/resource/", ":"))
                 index += 1
+            print("")
     return 0
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Actors Genealogy query machine! Powered with DBpedia knowledge")
     parser.add_argument("actor1", nargs="?", default="Orson Welles")
     parser.add_argument("actor2", nargs="?", default="Jack Nicholson")
+    parser.add_argument("alternatives", nargs="?", default=1)
     arguments = vars(parser.parse_args())
     sys.exit(main(arguments))
