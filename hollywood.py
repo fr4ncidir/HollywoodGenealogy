@@ -82,6 +82,27 @@ def genealogy_research(actor1, actor2, n_alternatives=1):
             depht += 1
 
 
+def maybe_looking_for(actor,precision=4):
+    if " " in actor:
+        regex = actor.split()[0]
+    else:
+        regex = actor[0:min(precision,len(actor))]
+    query_similar = dbpedia_query(PREFIXES,
+        """
+        SELECT DISTINCT ?actor_name WHERE {{
+        ?actor foaf:name ?actor_name.
+        ?film dbpo:starring ?actor.
+        FILTER regex(?actor_name, '{}', 'i')
+        }}
+        """.format(regex))["results"]["bindings"]
+    if not query_similar:
+        print("DBpedia does not recognize {}".format(actor))
+    else:
+        print("Maybe you were looking for...")
+        for suggestion in query_similar:
+            print(suggestion["actor_name"]["value"])
+
+
 def main(args):
     actor1 = "\"{}\"".format(args["actor1"])
     actor2 = "\"{}\"".format(args["actor2"])
@@ -89,12 +110,17 @@ def main(args):
     query_actors = dbpedia_query(PREFIXES,
         """
         SELECT ?actor1 ?actor2 WHERE {{
-        ?actor1 foaf:name {}@en.
-        ?film1 dbpo:starring ?actor1.
-        ?actor2 foaf:name {}@en.
-        ?film2 dbpo:starring ?actor2. }} LIMIT 1""".format(actor1,actor2))["results"]["bindings"]
-    if not query_actors:
-        logging.error("Unfortunately DBpedia did not recognize one of the actors you suggested")
+        OPTIONAL {{?actor1 foaf:name {}@en.
+        ?film1 dbpo:starring ?actor1.}}
+        OPTIONAL {{?actor2 foaf:name {}@en.
+        ?film2 dbpo:starring ?actor2.}} }} LIMIT 1""".format(actor1,actor2))["results"]["bindings"]
+    if "actor1" not in query_actors[0]:
+        print("Unable to find {}.".format(actor1))
+        maybe_looking_for(args["actor1"])
+        return 1
+    if "actor2" not in query_actors[0]:
+        print("Unable to find {}.".format(actor2))
+        maybe_looking_for(args["actor2"])
         return 1
     actor1_res = query_actors[0]["actor1"]["value"]
     actor2_res = query_actors[0]["actor2"]["value"]
